@@ -5,7 +5,7 @@
 }
 
 <style>
-    .svg-Canvas {
+    .svg-Canvas-Box {
         width: 500px;
         height: 500px;
     }
@@ -70,26 +70,24 @@
             <div class="col-sm-12">
                 <input type="button" class="btn btn-primary" onclick="downloadBlueprint();" value="Save" />
             </div>
-            <div class="col-sm-12">
-                <a id="btnDownload" class="btn btn-primary-outline" onclick="downloadBlueprint();">Download</a>
+            @*<div class="col-sm-12">
                 <img id="imgPreview" />
-            </div>
+            </div>*@
         </div>
     </div>
     <div class="col-sm-12 col-md-6">
-
-        <!-- Begin SVG Spam-->
-        <div id="svg-Canvas">
+        <!-- Begin SVG Canvas-->
+        <div id="svg-Canvas-Container" class="svg-Canvas-Box">
         </div>
-        <canvas style="display: none;" id="canvas"></canvas>
-        <!-- END SVG Spam-->
+        <canvas width="500" height="500" style="display: none;" id="canvas"></canvas>
+        <!-- END SVG Canvas-->
     </div>
 </div>
 
 <script type="text/javascript">
     $(document).ready(function () {
         $('#ddlProductType').on('change', function () {
-            var _canvas = document.getElementById('svg-Canvas');
+            var _canvas = document.getElementById('svg-Canvas-Container');
 
             if ($('#ddlProductType').val() == 1) {
                 _canvas.innerHTML = baseTrayCard;
@@ -102,24 +100,24 @@
         $('#ddlTopTextToggle').on('change', function () {
             var _productCanvas = document.getElementById('TrayCard_Canvas');
 
-            if ($('#ddlProductType').val() == 1) {
-                _productCanvas.innerHTML += topText;
+            if ($('#ddlTopTextToggle').val() == 1) {
+                $('#svgTextTop').remove();
             }
-            else if ($('#ddlProductType').val() == 2) {
-
+            else if ($('#ddlTopTextToggle').val() == 2) {
+                _productCanvas.innerHTML += topText;
             }
         });
 
         $('#ddlTopText_position').on('change', function () {
             var element = document.getElementById("svgTextTop");
             if ($('#ddlTopText_position').val() == 1) {
-                element.setAttribute("class", "svg-text-left");
+                element.setAttribute("x", "15%");
             }
             else if ($('#ddlTopText_position').val() == 2) {
-                element.setAttribute("class", "svg-text-middle");
+                element.setAttribute("x", "40%");
             }
             else if ($('#ddlTopText_position').val() == 3) {
-                element.setAttribute("class", "svg-text-right");
+                element.setAttribute("x", "70%");
             }
         });
 
