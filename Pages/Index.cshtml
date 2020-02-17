@@ -1,0 +1,245 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<style>
+    .svg-Canvas {
+        width: 500px;
+        height: 500px;
+    }
+
+    .svg-text-left {
+        text-anchor: start;
+    }
+
+    .svg-text-middle {
+        text-anchor: middle;
+    }
+
+    .svg-text-right {
+        text-anchor: end;
+    }
+</style>
+
+<div class="row">
+    <div class="col-sm-12 col-md-6">
+        <div class="row">
+            <div class="col-sm-12">
+                <h5>Product Details</h5>
+                <hr />
+                <div class="form-group">
+                    <label for="ddlProductType">Product Type:</label>
+                    <select id="ddlProductType" class="form-control">
+                        <option value="-1">-- Choose --</option>
+                        <option value="1">Tray Card</option>
+                        <option value="2">Folder</option>
+                    </select>
+                </div>
+                @*<div class="form-group">
+                    <label for="ddlHandle">Handle?</label>
+                    <select id="ddlHandle" class="form-control">
+                        <option value="-1">-- Choose --</option>
+                        <option value="1">Yes</option>
+                        <option value="2">No</option>
+                    </select>
+                </div>*@
+                <div class="form-group">
+                    <label for="ddlTopTextToggle">Top Text?</label>
+                    <select id="ddlTopTextToggle" class="form-control">
+                        <option value="1">No</option>
+                        <option value="2">Yes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="txtTop">Text:</label>
+                    <input id="txtTop" type="text" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="ddlTopText_position">Text Position:</label>
+                    <select id="ddlTopText_position" class="form-control">
+                        <option value="1">Left</option>
+                        <option value="2">Middle</option>
+                        <option value="3">Right</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <input type="button" class="btn btn-primary" onclick="downloadBlueprint();" value="Save" />
+            </div>
+            <div class="col-sm-12">
+                <a id="btnDownload" class="btn btn-primary-outline" onclick="downloadBlueprint();">Download</a>
+                <img id="imgPreview" />
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-6">
+
+        <!-- Begin SVG Spam-->
+        <div id="svg-Canvas">
+        </div>
+        <canvas style="display: none;" id="canvas"></canvas>
+        <!-- END SVG Spam-->
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#ddlProductType').on('change', function () {
+            var _canvas = document.getElementById('svg-Canvas');
+
+            if ($('#ddlProductType').val() == 1) {
+                _canvas.innerHTML = baseTrayCard;
+            }
+            else if ($('#ddlProductType').val() == 2) {
+                $('#svg_CardTray_base').remove();
+            }
+        });
+
+        $('#ddlTopTextToggle').on('change', function () {
+            var _productCanvas = document.getElementById('TrayCard_Canvas');
+
+            if ($('#ddlProductType').val() == 1) {
+                _productCanvas.innerHTML += topText;
+            }
+            else if ($('#ddlProductType').val() == 2) {
+
+            }
+        });
+
+        $('#ddlTopText_position').on('change', function () {
+            var element = document.getElementById("svgTextTop");
+            if ($('#ddlTopText_position').val() == 1) {
+                element.setAttribute("class", "svg-text-left");
+            }
+            else if ($('#ddlTopText_position').val() == 2) {
+                element.setAttribute("class", "svg-text-middle");
+            }
+            else if ($('#ddlTopText_position').val() == 3) {
+                element.setAttribute("class", "svg-text-right");
+            }
+        });
+
+        $('#txtTop').on('change', function () {
+            $('#svgTextTop').text($(this).val());
+        });
+    });
+
+    function downloadBlueprint() {        
+        var svgString = new XMLSerializer().serializeToString(document.getElementById('TrayCard_Canvas'));
+
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+        var DOMURL = self.URL || self.webkitURL || self;
+        var img = new Image();
+        var svg = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+        var url = DOMURL.createObjectURL(svg);
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0);
+            var png = canvas.toDataURL("image/png");
+
+            var event = new MouseEvent('click', {
+                'view': window,
+                'bubbles': true,
+                'cancelable': true
+            });
+
+            var a = document.createElement('a');
+            a.setAttribute('download', 'image.jpg');
+            a.setAttribute('href', png);
+            a.setAttribute('target', '_blank');
+            a.dispatchEvent(event);
+
+            DOMURL.revokeObjectURL(png);
+        };
+        img.src = url;
+    }
+
+    var topText = `<text id="svgTextTop" x="15" y="30" fill="red">TEST TEXT</text>`;
+
+    var baseTrayCard = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+                        <svg
+                           xmlns:dc="http://purl.org/dc/elements/1.1/"
+                           xmlns:cc="http://creativecommons.org/ns#"
+                           xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                           xmlns:svg="http://www.w3.org/2000/svg"
+                           xmlns="http://www.w3.org/2000/svg"
+                           xmlns:xlink="http://www.w3.org/1999/xlink"
+                           xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+                           xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+                           viewBox="0 0 210 297"
+                           version="1.1"
+                           id="TrayCard_Canvas"
+                           sodipodi:docname="traycard.svg"
+                           inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
+                          <defs
+                             id="defs4684">
+                            <linearGradient
+                               gradientTransform="matrix(1.5772301,0,0,1.9444748,-61.854643,-68.90234)"
+                               inkscape:collect="always"
+                               xlink:href="#linearGradient4666"
+                               id="linearGradient4668"
+                               x1="40.357697"
+                               y1="111.78222"
+                               x2="229.85179"
+                               y2="259.84955"
+                               gradientUnits="userSpaceOnUse" />
+                            <linearGradient
+                               inkscape:collect="always"
+                               id="linearGradient4666">
+                              <stop
+                                 style="stop-color:#939dac;stop-opacity:1;"
+                                 offset="0"
+                                 id="stop4662" />
+                              <stop
+                                 style="stop-color:#939dac;stop-opacity:0;"
+                                 offset="1"
+                                 id="stop4664" />
+                            </linearGradient>
+                          </defs>
+                          <sodipodi:namedview
+                             id="base"
+                             pagecolor="#ffffff"
+                             bordercolor="#666666"
+                             borderopacity="1.0"
+                             inkscape:pageopacity="0.0"
+                             inkscape:pageshadow="2"
+                             inkscape:zoom="0.35"
+                             inkscape:cx="400"
+                             inkscape:cy="560"
+                             inkscape:document-units="mm"
+                             inkscape:current-layer="layer1"
+                             showgrid="false"
+                             inkscape:window-width="2560"
+                             inkscape:window-height="1377"
+                             inkscape:window-x="2552"
+                             inkscape:window-y="-8"
+                             inkscape:window-maximized="1" />
+                          <metadata
+                             id="metadata4687">
+                            <rdf:RDF>
+                              <cc:Work
+                                 rdf:about="">
+                                <dc:format>image/svg+xml</dc:format>
+                                <dc:type
+                                   rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+                                <dc:title></dc:title>
+                              </cc:Work>
+                            </rdf:RDF>
+                          </metadata>
+                          <g
+                             inkscape:label="Layer 1"
+                             inkscape:groupmode="layer"
+                             id="layer1">
+                            <path
+                               inkscape:connector-curvature="0"
+                               style="fill:url(#linearGradient4668);fill-opacity:1;stroke-width:0.46335211"
+                               d="M 10.000317,1.3805817 H 200.15444 c 4.54368,0 8.20159,5.2901382 8.20159,11.8612963 V 283.66884 c 0,6.57116 -3.65791,11.8613 -8.20159,11.8613 H 10.000317 c -4.5436846,0 -8.2015808,-5.29014 -8.2015808,-11.8613 V 13.241878 c 0,-6.5711581 3.6578962,-11.8612963 8.2015808,-11.8612963 z"
+                               id="rect4660" />
+                          </g>
+                        </svg>`;
+</script>
