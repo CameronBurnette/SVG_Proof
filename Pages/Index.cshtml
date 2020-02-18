@@ -6,8 +6,8 @@
 
 <style>
     .svg-Canvas-Box {
-        width: 500px;
-        height: 500px;
+        /*width: 500px;
+        height: 500px;*/
     }
 
     .svg-text-left {
@@ -37,14 +37,24 @@
                         <option value="2">Folder</option>
                     </select>
                 </div>
-                @*<div class="form-group">
+                <div class="form-group">
                     <label for="ddlHandle">Handle?</label>
                     <select id="ddlHandle" class="form-control">
-                        <option value="-1">-- Choose --</option>
-                        <option value="1">Yes</option>
-                        <option value="2">No</option>
+                        <option value="1">No</option>
+                        <option value="2">Yes</option>
                     </select>
-                </div>*@
+                </div>
+                <div class="form-group">
+                    <label for="ddlHandlePosition">Handle Position:</label>
+                    <select id="ddlHandlePosition" class="form-control">
+                        <option value="1">Top Center</option>
+                        <option value="2">Top Left</option>
+                        <option value="3">Top Right</option>
+                        <option value="4">Side Center</option>
+                        <option value="5">Side Left</option>
+                        <option value="6">Side Right</option>
+                    </select>
+                </div>
                 <div class="form-group">
                     <label for="ddlTopTextToggle">Top Text?</label>
                     <select id="ddlTopTextToggle" class="form-control">
@@ -89,52 +99,110 @@
         $('#ddlProductType').on('change', function () {
             var _canvas = document.getElementById('svg-Canvas-Container');
 
-            if ($('#ddlProductType').val() == 1) {
-                _canvas.innerHTML = baseTrayCard;
-            }
-            else if ($('#ddlProductType').val() == 2) {
-                $('#svg_CardTray_base').remove();
+            switch ($(this).val()) {
+                case "1":
+                    _canvas.innerHTML = baseTrayCard;
+                    break;
+                case "2":
+                    $('#svg_CardTray_base').remove();
+                    break;
+                default:
+                    break;
             }
         });
 
         $('#ddlTopTextToggle').on('change', function () {
             var _productCanvas = document.getElementById('TrayCard_Canvas');
 
-            if ($('#ddlTopTextToggle').val() == 1) {
-                $('#svgTextTop').remove();
-            }
-            else if ($('#ddlTopTextToggle').val() == 2) {
-                _productCanvas.innerHTML += topText;
+            switch ($(this).val()) {
+                case "1":
+                    $('#svgTextTop').remove();
+                    break;
+                case "2":
+                    _productCanvas.innerHTML += topText;
+                    break;
+                default:
+                    break;
             }
         });
 
         $('#ddlTopText_position').on('change', function () {
             var element = document.getElementById("svgTextTop");
-            if ($('#ddlTopText_position').val() == 1) {
-                element.setAttribute("x", "15%");
-            }
-            else if ($('#ddlTopText_position').val() == 2) {
-                element.setAttribute("x", "40%");
-            }
-            else if ($('#ddlTopText_position').val() == 3) {
-                element.setAttribute("x", "70%");
+            switch ($(this).val()) {
+                case "1":
+                    element.setAttribute("x", "5%");
+                    element.setAttribute("text-anchor", "start");
+                    break;
+                case "2":
+                    element.setAttribute("x", "50%");
+                    element.setAttribute("text-anchor", "middle");
+                    break;
+                case "3":
+                    element.setAttribute("x", "95%");
+                    element.setAttribute("text-anchor", "end");
+                    break;
+                default:
+                    break;
             }
         });
 
         $('#txtTop').on('change', function () {
             $('#svgTextTop').text($(this).val());
         });
+
+        $('#ddlHandle').on('change', function () {
+            var select = $('#ddlHandle');
+            var handle = document.getElementById('svgHandle');
+            switch ($(this).val()) {
+                case "1":
+                    $('#svgHandle').remove();
+                    break;
+                case "2":
+                    var _productCanvas = document.getElementById('TrayCard_Canvas');
+                    _productCanvas.innerHTML += handleText;
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        $('#ddlHandlePosition').on('change', function () {
+            var handle = document.getElementById('svgHandle');
+            switch ($(this).val()) {
+                case "1":
+                    handle.setAttribute('transform', 'translate(0,-100)');
+                    break;
+                case "2":
+                    handle.setAttribute('transform', 'translate(-60,-100)');
+                    break;
+                case "3":
+                    handle.setAttribute('transform', 'translate(60,-100)');
+                    break;
+                case "4":
+                    handle.setAttribute('transform', 'rotate(-90) translate(-250, -100)');
+                    break;
+                case "5":
+                    handle.setAttribute('transform', 'rotate(-90) translate(-360, -100)');
+                    break;
+                case "6":
+                    handle.setAttribute('transform', 'rotate(-90) translate(-160, -100)');
+                    break;
+                default:
+                    break;
+            }
+        });
     });
 
-    function downloadBlueprint() {        
+    function downloadBlueprint() {      
         var svgString = new XMLSerializer().serializeToString(document.getElementById('TrayCard_Canvas'));
-
         var canvas = document.getElementById("canvas");
         var ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         var DOMURL = self.URL || self.webkitURL || self;
         var img = new Image();
         var svg = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
         var url = DOMURL.createObjectURL(svg);
+
         img.onload = function () {
             ctx.drawImage(img, 0, 0);
             var png = canvas.toDataURL("image/png");
@@ -153,10 +221,18 @@
 
             DOMURL.revokeObjectURL(png);
         };
+
         img.src = url;
     }
 
-    var topText = `<text id="svgTextTop" x="15" y="30" fill="red">TEST TEXT</text>`;
+    var topText = `<text id="svgTextTop" x="5%" y="5%" fill="#212529" text-anchor="start" dominant-baseline="central">TEST TEXT</text>`;
+
+    var handleText = `<path id="svgHandle" transform="translate(0,-100)" 
+                style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+                d="m 94.955576,127.19139 c 3.83451,-1.35534 4.21489,-1.64161 5.818344,-2.99695 l 18.01316,-0.26727 c 1.69309,2.79265 2.07363,3.02853 4.93268,3.53149 3.30356,0.25182 4.47476,-0.77576 6.09348,-1.53483 1.46334,-1.74516 1.79109,-3.11178 2.222,-4.51279 0.31491,-1.41745 0.01,-3.14486 -0.37798,-4.91369 -0.54832,-2.56066 -2.22738,-4.55595 -4.91369,-6.04762 -2.39758,-1.00421 -5.19942,-1.60415 -7.9375,-2.26786 l -19.406494,0.37798 c -1.93302,0.49023 -6.13906,0.71382 -8.51654,2.22808 0.15138,0 -2.61486,1.84489 -3.69727,4.89255 l -0.12577,4.82198 c 0.94178,2.54054 0.27994,3.27579 2.95896,5.04732 2.0019,1.39697 2.93472,1.58637 4.93662,1.64161 z"
+                id="path962"
+                inkscape:connector-curvature="0"
+                sodipodi:nodetypes="ccccccccccccccc" />`;
 
     var baseTrayCard = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
